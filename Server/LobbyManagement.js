@@ -17,7 +17,9 @@ function connection(socket){
 
 	socket.on('join', function(data ){
 		console.log(data.namePlayer + " join " + data.nameServer + " server");
-			join(socket,data.nameServer, data.namePlayer);
+		join(socket,data.nameServer, data.namePlayer);
+		socket.broadcast.emit("newPlayerJoin", {nameNewPlayer : data.namePlayer });
+
 	});
 
 	socket.on('create', function(data ){
@@ -25,6 +27,15 @@ function connection(socket){
 		CreateLobby(socket, data.nameServer,data.namePlayer)
 	});
 
+	socket.on("listLobby" , function(data){
+		socket.emit("listLobby",{lobbyList : listLobby} );
+	});
+
+	socket.on("listPlayer" , function(data){
+		var listPlayerJson = listPlayerByServerName(data.nameServer);
+		console.log(listPlayerJson);
+		socket.emit("listPlayer",{playerList : listPlayerJson} );
+	});
 }
 
 function CreateLobby(socket,  nameServer, namePlayer){
@@ -50,4 +61,13 @@ function findLobbyByName(name){
 		}
 	}
 	return 0;
+}
+
+function listPlayerByServerName(name){
+	var i =0;
+	for(i=0;i < listLobby.length;i++){
+		if(listLobby[i].name == name) {
+			return listLobby[i].playerList;
+		}
+	}
 }
