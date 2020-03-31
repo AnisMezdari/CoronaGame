@@ -122,6 +122,7 @@ namespace SocketIO
 		public void Start()
 		{
 			if (autoConnect) { Connect(); }
+			DontDestroyOnLoad(this);
 		}
 
 		public void Update()
@@ -402,6 +403,7 @@ namespace SocketIO
 					#if SOCKET_IO_DEBUG
 					debugMethod.Invoke(ex.ToString());
 					#endif
+					//Debug.LogError(ex);
 				}
 			}
 		}

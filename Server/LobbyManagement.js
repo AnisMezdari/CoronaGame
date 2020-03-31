@@ -3,12 +3,16 @@ const Player = require("./Player");
 
 var listLobby = [];
 
+var playerManagement = require("./PlayerManagement");
+
+
 module.exports = {
 
 	Main : function(io){
 		io.on('connection', function(socket){
 			console.log("connected");
-			connection(socket)
+			connection(socket);
+
 		});
 	},
 };
@@ -17,8 +21,11 @@ function connection(socket){
 
 	socket.on('join', function(data ){
 		console.log(data.namePlayer + " join " + data.nameServer + " server");
-		join(socket,data.nameServer, data.namePlayer);
+		var player = join(socket,data.nameServer, data.namePlayer);
 		socket.broadcast.emit("newPlayerJoin", {nameNewPlayer : data.namePlayer });
+		console.log(player);
+		socket.emit("player" , {playerObject : player });
+
 
 	});
 
@@ -40,17 +47,20 @@ function connection(socket){
 
 function CreateLobby(socket,  nameServer, namePlayer){
   var newLobby = new Lobby(nameServer);
-  var player = new Player(namePlayer);
+  var player = new Player(namePlayer,0);
   newLobby.playerList.push(player);
   listLobby.push(newLobby);
+	playerManagement.sharePosition(socket, newLobby.playerList);
 	console.log(listLobby);
 }
 
 function join(socket, nameServer, namePlayer){
   var indexServ = findLobbyByName(nameServer);
   var lobbyObj = listLobby[indexServ];
-  var player = new Player(namePlayer);
+  var player = new Player(namePlayer, lobbyObj.playerList.length);
   lobbyObj.playerList.push(player);
+	playerManagement.sharePosition(socket, lobbyObj.playerList);
+	return player;
 }
 
 function findLobbyByName(name){
