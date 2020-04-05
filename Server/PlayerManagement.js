@@ -8,7 +8,6 @@ module.exports = {
 			currentPlayer.position.x = data.x;
 			currentPlayer.position.y = data.y;
 			currentPlayer.position.z = data.z;
-			console.log(currentPlayer);
       socket.broadcast.emit("positionEmit" , {player : currentPlayer});
     });
 	},

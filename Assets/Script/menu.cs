@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using SocketIO;
+using UnityEngine.SceneManagement;
 
 public class Menu : MonoBehaviour
 {
@@ -20,6 +21,8 @@ public class Menu : MonoBehaviour
 
     public GameObject  player;
 
+    public GameObject buttonStart;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -27,6 +30,8 @@ public class Menu : MonoBehaviour
         socket.On("newPlayerJoin", DisplayNewPlayerJoin);
 
         socket.On("player", SetPlayer);
+
+        socket.On("startGame", StartGame);
 
     }
 
@@ -88,14 +93,14 @@ public class Menu : MonoBehaviour
         playerObject.GetComponent<Corona.Player>().name = playerName;
         playerObject.GetComponent<Corona.Player>().isLocalPlayer = true;
         playerObject.GetComponent<Corona.Player>().index = 0;
-
+        playerObject.GetComponent<Corona.Player>().isAdmin = true;
+        LocalPlayerIsAdmin();
     }
 
     public void GetListLobby(SocketIOEvent e)
     {
         JSONObject listLobbyJson = e.data.GetField("lobbyList");
         string[] listLobbyNameString = new string[listLobbyJson.Count];
-        Debug.Log(listLobbyJson);
         for (int i = 0; i < listLobbyJson.Count; i++)
         {
             listLobbyNameString[i] = listLobbyJson[i].GetField("name").ToString();
@@ -142,11 +147,11 @@ public class Menu : MonoBehaviour
                 playerObject.GetComponent<Corona.Player>().name = json[i].GetField("name").str;
                 playerObject.GetComponent<Corona.Player>().isLocalPlayer = false;
                 playerObject.GetComponent<Corona.Player>().index = i;
+                playerObject.GetComponent<Corona.Player>().isAdmin = bool.Parse(json[i].GetField("isAdmin").ToString());
             }
            
         }
-
-        Debug.Log(json);
+        LocalPlayerIsAdmin();
     }
 
     
@@ -158,6 +163,38 @@ public class Menu : MonoBehaviour
         playerObject.GetComponent<Corona.Player>().name = nameNewPlayer;
         playerObject.GetComponent<Corona.Player>().isLocalPlayer = false;
         playerObject.GetComponent<Corona.Player>().index = currentNbPlayer;
+        playerObject.GetComponent<Corona.Player>().isAdmin = false;
         currentNbPlayer++;
+    }
+
+    public void LocalPlayerIsAdmin()
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+
+        foreach(GameObject item in players)
+        {
+            if(item.GetComponent<Corona.Player>().isLocalPlayer  && item.GetComponent<Corona.Player>().isAdmin)
+            {
+                DisplayButtonStartParty();
+            }
+        }
+    }
+
+    public void DisplayButtonStartParty()
+    {
+        buttonStart.SetActive(true);
+    }
+
+
+    public void OnclickStartGame()
+    {
+        SceneManager.LoadScene("Party", LoadSceneMode.Single);
+        socket.Emit("startGame");
+
+    }
+
+    public void StartGame(SocketIOEvent e)
+    {
+        SceneManager.LoadScene("Party", LoadSceneMode.Single);
     }
 }

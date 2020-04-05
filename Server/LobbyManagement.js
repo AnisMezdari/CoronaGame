@@ -43,11 +43,15 @@ function connection(socket){
 		console.log(listPlayerJson);
 		socket.emit("listPlayer",{playerList : listPlayerJson} );
 	});
+
+	socket.on("startGame", function(data){
+		socket.broadcast.emit("startGame");
+	})
 }
 
 function CreateLobby(socket,  nameServer, namePlayer){
   var newLobby = new Lobby(nameServer);
-  var player = new Player(namePlayer,0);
+  var player = new Player(namePlayer,0,true);
   newLobby.playerList.push(player);
   listLobby.push(newLobby);
 	playerManagement.sharePosition(socket, newLobby.playerList);
@@ -57,7 +61,7 @@ function CreateLobby(socket,  nameServer, namePlayer){
 function join(socket, nameServer, namePlayer){
   var indexServ = findLobbyByName(nameServer);
   var lobbyObj = listLobby[indexServ];
-  var player = new Player(namePlayer, lobbyObj.playerList.length);
+  var player = new Player(namePlayer, lobbyObj.playerList.length,false);
   lobbyObj.playerList.push(player);
 	playerManagement.sharePosition(socket, lobbyObj.playerList);
 	return player;

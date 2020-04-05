@@ -11,11 +11,13 @@ namespace Corona
         public int index;
         public string name;
         public bool isLocalPlayer;
+        public bool isAdmin;
 
         // Start is called before the first frame update
         void Start()
         {
             DontDestroyOnLoad(this);
+
         }
 
         // Update is called once per frame
@@ -23,5 +25,7 @@ namespace Corona
         {
 
         }
+
+
     }
 }
