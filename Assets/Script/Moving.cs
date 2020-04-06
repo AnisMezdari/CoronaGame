@@ -32,7 +32,7 @@ public class Moving : MonoBehaviour
         {
             if (Input.GetKey(KeyCode.Z))
             {
-                this.transform.position += new Vector3(0, 0, 1 * Time.deltaTime * vitesse);
+                this.transform.position += this.transform.forward * Time.deltaTime * vitesse;
                 isMoving = true;
                 isRunning = true;
             }
@@ -40,13 +40,13 @@ public class Moving : MonoBehaviour
             if (Input.GetKey(KeyCode.D))
             {
                 //this.transform.position += new Vector3(1 * Time.deltaTime * vitesse, 0, 0);
-                transform.Rotate(0, -1 * Time.deltaTime * vitesseRotation);
+                transform.Rotate(0, 1 * Time.deltaTime * vitesseRotation,0); ;
             }
 
             if (Input.GetKey(KeyCode.Q))
             {
                 //this.transform.position += new Vector3(-1 * Time.deltaTime * vitesse, 0, 0);
-                transform.Rotate(0, 1 * Time.deltaTime * vitesseRotation);
+                transform.Rotate(0, -1 * Time.deltaTime * vitesseRotation,0);
             }
 
             if (Input.GetKey(KeyCode.S))
@@ -54,7 +54,7 @@ public class Moving : MonoBehaviour
                 this.transform.position += new Vector3(0, 0, -1 * Time.deltaTime * vitesse);
             }
 
-            if (Input.GetKey(KeyCode.LeftAlt))
+            if (Input.GetKeyDown(KeyCode.LeftAlt))
             {
                 if (isCrouching)
                 {
