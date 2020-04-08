@@ -7,12 +7,12 @@ public class Moving : MonoBehaviour
 {
 
     public SocketIOComponent socket;
-    public int vitesse = 1;
+    public int vitesse = 2;
     public int vitesseRotation = 1;
 
     private bool isMoving = false;
     private bool isRunning = false;
-    private bool isCrouching = false;
+    private bool isSquatting = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -30,11 +30,39 @@ public class Moving : MonoBehaviour
 
         if (this.GetComponent<Corona.Player>().isLocalPlayer)
         {
-            if (Input.GetKey(KeyCode.Z))
+            if (Input.GetKey(KeyCode.Z) && !isSquatting || Input.GetKey(KeyCode.Z) && Input.GetKey(KeyCode.LeftAlt))
             {
                 this.transform.position += this.transform.forward * Time.deltaTime * vitesse;
-                isMoving = true;
-                isRunning = true;
+                if (Input.GetKey(KeyCode.Z) && Input.GetKey(KeyCode.LeftAlt))
+                {
+                    vitesse = 1;
+                    this.GetComponent<Animator>().SetBool("crouching", true);
+                    this.GetComponent<Animator>().SetBool("running", false);
+                    this.GetComponent<Animator>().SetBool("squatting", false);
+                }
+                else
+                {
+                    vitesse = 4;
+                    this.GetComponent<Animator>().SetBool("running", true);
+                    this.GetComponent<Animator>().SetBool("crouching", false);
+                    this.GetComponent<Animator>().SetBool("squatting", false);
+                }
+            }
+            else
+            {
+                this.GetComponent<Animator>().SetBool("running", false);
+                this.GetComponent<Animator>().SetBool("crouching", false);
+
+                if (Input.GetKey(KeyCode.LeftAlt))
+                {
+                    this.GetComponent<Animator>().SetBool("squatting", true);
+                    isSquatting = true;
+                }
+                else
+                {
+                    this.GetComponent<Animator>().SetBool("squatting", false);
+                    isSquatting = false;
+                }
             }
 
             if (Input.GetKey(KeyCode.D))
@@ -52,32 +80,8 @@ public class Moving : MonoBehaviour
             if (Input.GetKey(KeyCode.S))
             {
                 this.transform.position += new Vector3(0, 0, -1 * Time.deltaTime * vitesse);
-            }
-
-            if (Input.GetKeyDown(KeyCode.LeftAlt))
-            {
-                if (isCrouching)
-                {
-                    vitesse *= 2;
-                    this.GetComponent<Animator>().SetBool("crouching", false);
-                    isCrouching = false;
-                }
-                else
-                {
-                    vitesse /= 2;
-                    this.GetComponent<Animator>().SetBool("crouching", true);
-                    isCrouching = true;
-                }
-                
-            }
-
-            this.GetComponent<Animator>().SetBool("running", isRunning);
-
-
-            isRunning = false;
-            
+            }        
         }
-        
     }
 
     public void SharePosition()
