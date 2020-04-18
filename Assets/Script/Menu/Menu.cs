@@ -90,11 +90,21 @@ public class Menu : MonoBehaviour
         textServer.GetComponent<Text>().text = "[" + serverName + "]";
 
         GameObject playerObject = Instantiate(player, new Vector3(0, 0, 0), Quaternion.identity);
+        Debug.Log(playerObject.GetComponent<Corona.Player>().isAdmin);
+
+
+        StartCoroutine(SetPlayer(playerObject.GetComponent<Corona.Player>(), playerName));
         playerObject.GetComponent<Corona.Player>().name = playerName;
         playerObject.GetComponent<Corona.Player>().isLocalPlayer = true;
         playerObject.GetComponent<Corona.Player>().index = 0;
-        playerObject.GetComponent<Corona.Player>().isAdmin = true;
+
         LocalPlayerIsAdmin();
+    }
+
+    public IEnumerator SetPlayer(Corona.Player player , string playerName)
+    {
+        yield return new WaitForSeconds(0.5f);
+        player.isAdmin = true;
     }
 
     public void GetListLobby(SocketIOEvent e)

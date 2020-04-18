@@ -19,44 +19,47 @@ public class zombieBehavior : MonoBehaviour
     public bool errant;
     public bool withoutTarget;
 
+    private NetworkManagement network;
+
     void Start()
     {
-        eyes = this.transform.GetChild(transform.GetChildCount() - 1).gameObject;
-        agent = GetComponent<NavMeshAgent>();
-        players = GameObject.FindGameObjectsWithTag("Player");
-        listTarget = GameObject.Find("ListTargetZombie");
-        RandomTarget();
-        InvokeRepeating("FiedlVisionRepeating", 1, 0.5f);
-        withoutTarget = true;
-        errant = false;
+        network =  GameObject.Find("Game").GetComponent<NetworkManagement>();
+        if (network.isAdmin)
+        {
+            eyes = this.transform.GetChild(transform.GetChildCount() - 1).gameObject;
+            agent = GetComponent<NavMeshAgent>();
+            players = GameObject.FindGameObjectsWithTag("Player");
+            listTarget = GameObject.Find("ListTargetZombie");
+            RandomTarget();
+            InvokeRepeating("FiedlVisionRepeating", 1, 0.5f);
+            withoutTarget = true;
+            errant = false;
+
+        }
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-/*
-        if (zombie.errant)
+        if (network.isAdmin)
         {
-            if (detectPlayer)
+            if (withoutTarget)
             {
-                ZombieCharge();
+                TargetSystem();
             }
-        }*/
-
-        if (withoutTarget)
-        {
-            TargetSystem();
-        }
-        else
-        {
-            if (!errant) 
-            { 
-                ChargePlayer();
+            else
+            {
+                if (!errant)
+                {
+                    ChargePlayer();
+                }
             }
+            HasLoosePlayer();
+            IsArriveInTarget();
+            agent.SetDestination(target.position);
         }
-        HasLoosePlayer();
-        IsArriveInTarget();
-        agent.SetDestination(target.position);
+        
     }
 
     public void FiedlVisionRepeating()
@@ -113,6 +116,20 @@ public class zombieBehavior : MonoBehaviour
         }
     }
 
+    public List<GameObject> GetTargetNear(int distance)
+    {
+        List<GameObject> listTragetNear = new List<GameObject>();
+        for (int i = 0; i < listTarget.transform.childCount - 1; i++)
+        {
+            float dist = Vector3.Distance(listTarget.transform.GetChild(i).transform.position, transform.position);
+            if (dist < distance)
+            {
+                listTragetNear.Add(listTarget.transform.GetChild(i).gameObject);
+            }
+
+        }
+        return listTragetNear;
+    }
 
     public void RandomTarget()
     {

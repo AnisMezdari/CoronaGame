@@ -13,6 +13,7 @@ namespace Corona
         public bool isLocalPlayer;
         public bool isAdmin;
         public bool isDead;
+        private bool isPassed = false;
 
         // Start is called before the first frame update
         void Start()
@@ -23,6 +24,9 @@ namespace Corona
                 this.transform.GetChild(1).gameObject.SetActive(false);
                 this.transform.GetChild(0).gameObject.SetActive(false);
             }
+            isAdmin = false;
+
+
 
         }
 
@@ -30,7 +34,13 @@ namespace Corona
         void Update()
         {
             Die();
-            
+
+            if (isAdmin && GameObject.Find("Game") && !isPassed)
+            {
+                GameObject.Find("Game").GetComponent<NetworkManagement>().isAdmin = true;
+                isPassed = true;
+            }
+
         }
 
         private void OnCollisionEnter(Collision collision)

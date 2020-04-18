@@ -21,7 +21,7 @@ io.use(sharedsession(session, {
 }));
 io.attach(PORT);
 
-var tools = require("./LobbyManagement");
+var tools = require("./Lobby/LobbyManagement");
 tools.Main(io);
 
 
